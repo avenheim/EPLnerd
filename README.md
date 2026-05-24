@@ -12,6 +12,14 @@ EPL Nerd is an intelligent conversational agent that allows you to query, analyz
 * **Multilingual Support:** Responds fluently in casual Indonesian.
 * **Season-Aware:** Smart filtering and aggregation for specific Premier League seasons.
 
+## 📊 Data Source
+This project uses data from the [Fantasy Premier League](https://github.com/vaastav/Fantasy-Premier-League) repository by vaastav.
+
+**Citation:**
+If you use this dataset in your project, please cite it as follows:
+
+> Vaastav Anand. (2024). Fantasy Premier League Dataset. GitHub. https://github.com/vaastav/Fantasy-Premier-League
+
 ## 🛠️ Tech Stack
 
 * **Frontend:** [Streamlit](https://streamlit.io/)
