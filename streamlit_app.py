@@ -32,7 +32,7 @@ def initialize_agent():
     db = SQLDatabase.from_uri(st.secrets["DATABASE_URL"])
     llm = ChatGroq(
         temperature=0, 
-        model_name="llama-3.3-70b-versatile", 
+        model_name="llama-3.1-8b-instant", 
         groq_api_key=st.secrets["GROQ_API_KEY"]
     )
     
