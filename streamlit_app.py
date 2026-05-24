@@ -1,6 +1,100 @@
 import streamlit as st
+import pandas as pd
+from langchain_community.utilities import SQLDatabase
+from langchain_groq import ChatGroq
+from langchain_community.agent_toolkits import create_sql_agent
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.tools import tool
 
-st.title("🎈 My new app")
-st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
+# 1. UI Configuration
+st.set_page_config(page_title="EPL SQL Agent", page_icon="⚽", layout="wide")
+st.title("⚽ EPL Fantasy Data Agent")
+
+# 2. Visualization Tool Definition
+@tool
+def visualize_data(sql_query: str):
+    """
+    Executes a SQL query, stores the result as a DataFrame, 
+    and prepares it for rendering as a chart. 
+    Use this only when the user explicitly asks for a graph or chart.
+    """
+    try:
+        df = pd.read_sql(sql_query, st.secrets["DATABASE_URL"])
+        st.session_state.last_df = df
+        return f"Data retrieved successfully. I have created a chart with {len(df)} rows."
+    except Exception as e:
+        return f"Error executing query: {e}"
+
+# 3. Agent Initialization
+@st.cache_resource
+def initialize_agent():
+    db = SQLDatabase.from_uri(st.secrets["DATABASE_URL"])
+    llm = ChatGroq(
+        temperature=0, 
+        model_name="llama3-70b-8192", 
+        groq_api_key=st.secrets["GROQ_API_KEY"]
+    )
+    
+    # Define prompt with history support
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """You are an expert SQL analyst for Premier League data. 
+        - Always use the provided tools to answer.
+        - If asked to visualize, use the 'visualize_data' tool.
+        - If the user asks follow-up questions, use the chat history for context.
+        - Prioritize clarity and accuracy."""),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
+    ])
+    
+    # Add visualization tool to the agent
+    tools = [visualize_data]
+    
+    return create_sql_agent(llm, db=db, agent_type="tool-calling", prompt=prompt, tools=tools)
+
+agent = initialize_agent()
+
+# 4. Session State Management
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role": "assistant", "content": "I'm connected to your EPL database! Ask me for stats or to build a chart."}]
+if "last_df" not in st.session_state:
+    st.session_state.last_df = None
+
+# 5. Render Chat Interface
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+# 6. Handle User Input
+if prompt := st.chat_input("Ask a question about the EPL data..."):
+    # Display user input
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+
+    # Process response
+    with st.chat_message("assistant"):
+        with st.spinner("Analyzing..."):
+            try:
+                # Invoke agent
+                response = agent.invoke({
+                    "input": prompt,
+                    "chat_history": st.session_state.chat_history
+                })
+                
+                answer = response["output"]
+                st.write(answer)
+                
+                # Update history
+                st.session_state.messages.append({"role": "assistant", "content": answer})
+                st.session_state.chat_history.append(("human", prompt))
+                st.session_state.chat_history.append(("ai", answer))
+                
+                # Render chart if the tool was used
+                if st.session_state.last_df is not None:
+                    st.bar_chart(st.session_state.last_df)
+                    # Clear last_df after rendering
+                    st.session_state.last_df = None
+                    
+            except Exception as e:
+                st.error(f"Error: {e}")
