@@ -37,6 +37,7 @@ def initialize_agent():
     
     # We use PREFIX instead of a full PromptTemplate so we don't overwrite the built-in SQL rules.
     prefix = """You are an expert SQL analyst for Premier League data.
+- IMPORTANT: If the user asks for a 'chart', 'graph', 'plot', or 'visualization', you MUST use the 'visualize_data' tool. Do not just answer with text.
 - IMPORTANT: When filtering by season, use the format 'YYYY-YY' (e.g., '2023-24', '2024-25').
 - Do NOT use 'YYYY-YYYY' (e.g., do not use '2023-2024').
 - answer in casual indonesian language.
