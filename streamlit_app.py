@@ -54,8 +54,7 @@ def initialize_agent():
         db=db, 
         agent_type="tool-calling", 
         prefix=prefix,
-        tools=tools, # <--- Gunakan daftar gabungan di sini
-        verbose=True, 
+        tools=tools,
         handle_parsing_errors=True
     )
 
