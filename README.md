@@ -1,6 +1,6 @@
 # ⚽ EPL Nerd: AI-Powered Premier League Analyst
 
-This is built f or Final Project submission for LLMBased Tools and Gemini API Integration for Data Scientists course organized by Hacktiv8.
+This is built f or Final Project submission for LLM Based Tools and Gemini API Integration for Data Scientists course organized by Hacktiv8.
 
 EPL Nerd is an intelligent conversational agent that allows you to query, analyze, and visualize English Premier League data using natural language. Built with **Streamlit**, **LangChain**, and powered by **Groq's Llama 3 models**, this app bridges the gap between complex database queries and simple human questions.
 
