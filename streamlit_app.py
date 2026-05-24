@@ -64,7 +64,7 @@ agent = initialize_agent()
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "I'm connected to your EPL database! Ask me for stats or to build a chart."}]
+    st.session_state.messages = [{"role": "assistant", "content": "I'm connected to EPL database Retrieved 24th May 2026 from https://github.com/vaastav/Fantasy-Premier-League! Ask me for stats or to build a chart."}]
 if "last_df" not in st.session_state:
     st.session_state.last_df = None
 
